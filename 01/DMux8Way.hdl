@@ -16,5 +16,13 @@ CHIP DMux8Way {
     OUT a, b, c, d, e, f, g, h;
 
     PARTS:
-    // Put your code here:
+    // first layer
+    DMux(in=in, sel=sel[2], a=first4, b=second4); // split the 8 inputs using DMux
+
+    DMux4Way(in=first4, sel=sel[0..1], a=a, b=b, c=c, d=d); //
+
+    DMux4Way(in=second4, sel=sel[0..1], a=e, b=f, c=g, d=h); // 
+
+
+    
 }

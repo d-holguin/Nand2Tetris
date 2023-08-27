@@ -14,5 +14,15 @@ CHIP Mux {
     OUT out;
 
     PARTS:
-    // Put your code here:
+    // Inverts the 'sel' to produce 'notSel', helping decide which input to pass through.
+    Not(in=sel, out=notSel);
+
+    // If 'sel' is 0 (thus notSel is 1), 'a' will pass through; otherwise, it becomes 0.
+    And(a=a, b=notSel, out=aResult);
+
+    // If 'sel' is 1, 'b' will pass through; otherwise, it becomes 0.
+    And(a=b, b=sel, out=bResult);
+
+    // Combines the results to produce the final output, selecting either 'a' or 'b'.
+    Or(a=aResult, b=bResult, out=out);
 }

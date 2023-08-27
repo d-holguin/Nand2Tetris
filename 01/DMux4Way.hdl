@@ -16,5 +16,9 @@ CHIP DMux4Way {
     OUT a, b, c, d;
 
     PARTS:
-    // Put your code here:
+    //first layer
+    DMux(in=in, sel=sel[1], a=half1, b=half2);
+    // second layer
+    DMux(in=half1, sel=sel[0], a=a, b=b);
+    DMux(in=half2, sel=sel[0], a=c, b=d);
 }

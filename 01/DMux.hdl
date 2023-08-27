@@ -7,12 +7,23 @@
  * Demultiplexor:
  * {a, b} = {in, 0} if sel == 0
  *          {0, in} if sel == 1
+ *    If sel is 0, the value of in is routed to a, while b is set to 0.
+ *   If sel is 1, the value of in is routed to b, while a is set to 0.
  */
+
+ 
 
 CHIP DMux {
     IN in, sel;
     OUT a, b;
 
     PARTS:
-    // Put your code here:
+    // invert sel
+    Not(in=sel, out=notSel);
+    // If sel is 0 (thus notSel is 1), 'a' takes the value of 'in'. If sel is 1, 'a' will be 0.
+    And(a=in, b=notSel, out=a);
+
+    // If sel is 1, 'b' takes the value of 'in'. If sel is 0, 'b' will be 0.
+    And(a=in, b=sel, out=b);
+
 }
