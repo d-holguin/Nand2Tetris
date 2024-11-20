@@ -1,0 +1,58 @@
+// https://en.wikipedia.org/wiki/Multiply-with-carry_pseudorandom_number_generator
+class Rand {
+    field int a;
+    field int m;
+    field int state; 
+    field int carry;
+
+    constructor Rand new(int seed) {
+        let a = 3142;
+        let m = 32718 ;
+        let state = seed;
+        let carry = seed / m; 
+        return this;
+    }
+
+    // helper to perform module operation 
+    method int mod(int aParam, int bParam) {
+        var int modA;
+        var int modB;
+        var int result;
+
+        let modA = aParam;
+        let modB = bParam;
+
+        let result = modA - ((modA / modB) * modB);
+
+        if (result < 0) {
+            let result = result + modB;
+        }
+
+        return result;
+    }
+
+
+    method int next() {
+        var int temp;
+        let temp = (a * state) + carry;
+        let state = mod(temp, m);
+        let carry = temp / m;
+
+        if (state = 0) {
+            let state = 1;
+        }
+
+        return state;
+    }
+
+    // Get a random integer in the specified range [min, max]
+    method int getInt(int min, int max) {
+        var int randomValue;
+        
+        // Generate a new random number and restrict to the range
+        let randomValue = next();
+        let randomValue = mod(randomValue, (max - min + 1));
+        
+        return min + randomValue;
+    }
+}

@@ -1,0 +1,470 @@
+function Game.new 4
+push constant 10
+call Memory.alloc 1
+pop pointer 0
+push argument 2
+call Rand.new 1
+pop this 1
+push constant 240
+push constant 112
+call Bat.new 2
+pop this 2
+push constant 0
+pop this 3
+push constant 3
+pop this 4
+push argument 3
+pop this 7
+push constant 300
+pop this 8
+push constant 0
+pop this 9
+push argument 0
+pop this 5
+push this 5
+call Array.new 1
+pop this 0
+push argument 1
+pop this 6
+push constant 0
+pop local 0
+label WHILE_EXP0
+push local 0
+push this 5
+lt
+not
+if-goto WHILE_END0
+push this 1
+push constant 0
+push constant 496
+call Rand.getInt 3
+pop local 1
+push constant 13
+pop local 2
+push this 1
+push constant 0
+push constant 3
+call Rand.getInt 3
+pop local 3
+push local 0
+push this 0
+add
+push local 1
+push local 2
+push local 3
+push this 6
+push argument 2
+push local 0
+add
+call Debris.new 5
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push local 0
+push constant 1
+add
+pop local 0
+goto WHILE_EXP0
+label WHILE_END0
+push pointer 0
+return
+function Game.update 6
+push argument 0
+pop pointer 0
+call Keyboard.keyPressed 0
+pop local 1
+push local 1
+push constant 0
+eq
+not
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
+push local 1
+push constant 130
+eq
+if-goto IF_TRUE1
+goto IF_FALSE1
+label IF_TRUE1
+push this 2
+push constant 5
+neg
+push constant 0
+call Bat.move 3
+pop temp 0
+label IF_FALSE1
+push local 1
+push constant 131
+eq
+if-goto IF_TRUE2
+goto IF_FALSE2
+label IF_TRUE2
+push this 2
+push constant 0
+push constant 5
+neg
+call Bat.move 3
+pop temp 0
+label IF_FALSE2
+push local 1
+push constant 132
+eq
+if-goto IF_TRUE3
+goto IF_FALSE3
+label IF_TRUE3
+push this 2
+push constant 5
+push constant 0
+call Bat.move 3
+pop temp 0
+label IF_FALSE3
+push local 1
+push constant 133
+eq
+if-goto IF_TRUE4
+goto IF_FALSE4
+label IF_TRUE4
+push this 2
+push constant 0
+push constant 5
+call Bat.move 3
+pop temp 0
+label IF_FALSE4
+label IF_FALSE0
+push this 2
+call Bat.tick 1
+pop temp 0
+push this 9
+push constant 1
+add
+pop this 9
+push constant 0
+pop local 2
+label WHILE_EXP0
+push local 2
+push this 5
+lt
+not
+if-goto WHILE_END0
+push local 2
+push this 0
+add
+pop pointer 1
+push that 0
+pop local 3
+push local 3
+push this 2
+call Bat.getX 1
+push this 2
+call Bat.getY 1
+call Debris.tick 3
+pop temp 0
+push local 3
+call Debris.getY 1
+push constant 239
+gt
+push local 3
+call Debris.getX 1
+or
+push constant 0
+lt
+push local 3
+call Debris.getX 1
+or
+push constant 511
+gt
+if-goto IF_TRUE5
+goto IF_FALSE5
+label IF_TRUE5
+push local 3
+push this 2
+call Bat.getX 1
+push this 2
+call Bat.getY 1
+call Debris.resetPosition 3
+pop temp 0
+label IF_FALSE5
+push local 2
+push constant 1
+add
+pop local 2
+goto WHILE_EXP0
+label WHILE_END0
+push constant 0
+pop local 2
+label WHILE_EXP1
+push local 2
+push this 5
+lt
+not
+if-goto WHILE_END1
+push pointer 0
+push local 2
+call Game.checkCollision 2
+pop local 4
+push local 4
+if-goto IF_TRUE6
+goto IF_FALSE6
+label IF_TRUE6
+push this 4
+push constant 1
+sub
+pop this 4
+push pointer 0
+call Game.updateLivesCounter 1
+pop temp 0
+push local 2
+push this 0
+add
+pop pointer 1
+push that 0
+pop local 3
+push local 3
+push this 2
+call Bat.getX 1
+push this 2
+call Bat.getY 1
+call Debris.resetPosition 3
+pop temp 0
+goto IF_END6
+label IF_FALSE6
+push local 2
+push constant 1
+add
+pop local 2
+label IF_END6
+goto WHILE_EXP1
+label WHILE_END1
+push constant 0
+return
+function Game.shiftDebrisLeft 1
+push argument 0
+pop pointer 0
+push argument 1
+pop local 0
+label WHILE_EXP0
+push local 0
+push this 5
+push constant 1
+sub
+lt
+not
+if-goto WHILE_END0
+push local 0
+push this 0
+add
+push local 0
+push constant 1
+add
+push this 0
+add
+pop pointer 1
+push that 0
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push local 0
+push constant 1
+add
+pop local 0
+goto WHILE_EXP0
+label WHILE_END0
+push this 5
+push constant 1
+sub
+push this 0
+add
+push constant 0
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push constant 0
+return
+function Game.run 0
+push argument 0
+pop pointer 0
+push constant 0
+push constant 0
+call Output.moveCursor 2
+pop temp 0
+push constant 6
+call String.new 1
+push constant 76
+call String.appendChar 2
+push constant 105
+call String.appendChar 2
+push constant 118
+call String.appendChar 2
+push constant 101
+call String.appendChar 2
+push constant 115
+call String.appendChar 2
+push constant 58
+call String.appendChar 2
+call Output.printString 1
+pop temp 0
+push pointer 0
+call Game.updateLivesCounter 1
+pop temp 0
+push constant 0
+push constant 12
+push constant 511
+push constant 12
+call Screen.drawLine 4
+pop temp 0
+label WHILE_EXP0
+push constant 0
+not
+not
+if-goto WHILE_END0
+push this 3
+push constant 1
+add
+pop this 3
+push this 3
+push constant 3
+eq
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
+push pointer 0
+call Game.update 1
+pop temp 0
+push constant 0
+pop this 3
+label IF_FALSE0
+push this 4
+push constant 0
+eq
+if-goto IF_TRUE1
+goto IF_FALSE1
+label IF_TRUE1
+push constant 0
+return
+label IF_FALSE1
+push this 9
+push this 8
+gt
+if-goto IF_TRUE2
+goto IF_FALSE2
+label IF_TRUE2
+push constant 0
+not
+return
+label IF_FALSE2
+push constant 5
+call Sys.wait 1
+pop temp 0
+goto WHILE_EXP0
+label WHILE_END0
+push constant 0
+not
+return
+function Game.updateLivesCounter 0
+push argument 0
+pop pointer 0
+push constant 0
+push constant 6
+call Output.moveCursor 2
+pop temp 0
+push constant 0
+call Screen.setColor 1
+pop temp 0
+push constant 1
+call String.new 1
+push constant 32
+call String.appendChar 2
+call Output.printChar 1
+pop temp 0
+push constant 0
+not
+call Screen.setColor 1
+pop temp 0
+push constant 0
+push constant 6
+call Output.moveCursor 2
+pop temp 0
+push this 4
+call Output.printInt 1
+pop temp 0
+push constant 0
+return
+function Game.checkCollision 9
+push argument 0
+pop pointer 0
+push argument 1
+push this 0
+add
+pop pointer 1
+push that 0
+pop local 0
+push this 2
+call Bat.getX 1
+push constant 16
+sub
+pop local 1
+push this 2
+call Bat.getX 1
+push constant 16
+add
+pop local 2
+push this 2
+call Bat.getY 1
+push constant 16
+sub
+pop local 3
+push this 2
+call Bat.getY 1
+push constant 16
+add
+pop local 4
+push local 0
+call Debris.getX 1
+push constant 8
+sub
+pop local 5
+push local 0
+call Debris.getX 1
+push constant 8
+add
+pop local 6
+push local 0
+call Debris.getY 1
+push constant 8
+sub
+pop local 7
+push local 0
+call Debris.getY 1
+push constant 8
+add
+pop local 8
+push local 1
+push local 6
+lt
+push local 2
+push local 5
+gt
+and
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
+push local 3
+push local 8
+lt
+push local 4
+push local 7
+gt
+and
+if-goto IF_TRUE1
+goto IF_FALSE1
+label IF_TRUE1
+push constant 0
+not
+return
+label IF_FALSE1
+label IF_FALSE0
+push constant 0
+return

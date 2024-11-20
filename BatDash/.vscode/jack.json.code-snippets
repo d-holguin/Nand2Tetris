@@ -1,0 +1,12 @@
+{
+    "myCustomMethod": {
+        "prefix": "myCustomMethod",
+        "body": [
+            "method void myCustomMethod(int arg1, int arg2) {",
+            "    // method body here",
+            "    return;",
+            "}"
+        ],
+        "description": "Defines a custom method in Jack."
+    }
+}

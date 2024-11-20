@@ -1,0 +1,82 @@
+// D Holguin implementation of a simple dodge game where you place as a bat dodging "debris"(generic name could be better)
+class Main {
+    function void main() {
+        var Game game;
+        var int level;
+        var boolean gameSuccess;
+       
+        do Main.displayStartScreen();
+
+        let level = 1;
+
+        while (true) {
+            let game = Game.new(2 + level, 2 + level, 1932 + level, level); // Increase difficulty with level
+            do Main.printLevel(level);
+            let gameSuccess = game.run();
+
+            if (~gameSuccess) { // Game over
+                do Screen.clearScreen();
+                do Output.moveCursor(11, 20);
+                do Output.printString("Game Over! Final Level: ");
+                do Output.printInt(level);
+                return;
+            }
+            let level = level + 1;
+            do Screen.clearScreen();
+            do Output.moveCursor(11, 20);
+            do Output.printString("Congrats! To the Next Level");
+            do Sys.wait(2500); 
+            do Screen.clearScreen();
+
+        }
+        return;
+    }
+
+    function void printLevel(int level) {
+        do Output.moveCursor(0, 29);
+        do Output.printString("Bat Dash");
+        do Output.moveCursor(0, 56);
+        do Output.printString("Level ");
+        do Output.printInt(level);
+        return;
+    }
+
+    function void displayStartScreen() {
+        var int keyPressed;
+        var Bat startScreenBat;
+        do Screen.clearScreen();
+        
+        // Title and instructions
+        do Output.moveCursor(4, (64 - 18) / 2); // "Welcome to Bat Dash!" is 18 chars
+        do Output.printString("Welcome to Bat Dash!");
+
+        do Output.moveCursor(6, (64 - 39) / 2); // "Dodge and dash away from the debris." is 39 chars
+        do Output.printString("Dodge and dash away from the obstacles.");
+
+        do Output.moveCursor(8, (64 - 40) / 2); // "Survive long enough to reach the next level!" is 40 chars
+        do Output.printString("Survive long enough to reach the next level!");
+
+        do Output.moveCursor(10, (64 - 22) / 2); // "Use Arrow Keys to Move." is 22 chars
+        do Output.printString("Use Arrow Keys to Move.");
+
+        do Output.moveCursor(12, (64 - 20) / 2); // "Press SPACE to start" is 20 chars
+        do Output.printString("Press SPACE to start");
+
+        let startScreenBat = Bat.new(240, 152);
+        do startScreenBat.tick();
+
+        // Wait for SPACE key press to start
+        while (true) {
+            let keyPressed = Keyboard.keyPressed();  
+            if (keyPressed = 32) {  
+                do Screen.clearScreen();
+                do startScreenBat.dispose();
+                return;
+            }
+            do Sys.wait(10); 
+        }
+        do Screen.clearScreen();
+        do startScreenBat.dispose();
+        return;
+    }
+}

@@ -1,0 +1,1 @@
+This is the Jack Compiler for the Nand2Tetris course. It translate high level `Jack` code into Hack computer VM code. 

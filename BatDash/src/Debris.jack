@@ -1,0 +1,300 @@
+class Debris {
+    field int frameCounter;
+    field int animationState; 
+    field int prevBaseLocation;
+    field int baseLocation;     
+    field int x;
+    field int y;
+    field int prevX;
+    field int prevY;
+    field int width;
+    field int height;
+    field int direction; // 0=left, 1=right, 2=top 
+    field Rand rand;
+    field int speed;
+
+    constructor Debris new(int startX, int startY, int startDirection, int maxSpeed, int seed){
+        let rand = Rand.new(seed);
+        let x = startX;
+        let y = startY;
+        let direction = startDirection;
+        let prevX = x;
+        let prevY = y;
+        let width = 16;  
+        let height = 16;
+        do updateBaseLocation();
+        let prevBaseLocation = baseLocation;
+        let speed = rand.getInt(1, maxSpeed);
+        let animationState = rand.getInt(0, 5);
+        let frameCounter = 0;
+        return this;
+    }
+
+    method int getX() {
+        return x;
+    }
+
+    method int getY() {
+        return y;
+    }
+
+    method int getHeight(){
+        return height;
+    }
+
+    method int getWidth() {
+        return width;
+    }
+
+    // not ideal to need to pass in bat x and y
+    method void tick(int batX, int batY) {
+
+    let frameCounter = frameCounter + 1;
+        // Clear the previous location
+        do clear(prevBaseLocation);
+
+        // Update previous positions
+        let prevX = x;
+        let prevY = y;
+        do updatePrevBaseLocation();
+
+        // Move debris based on direction
+        if (direction = 0) { // Moving left
+            let x = x - speed;
+        } else {
+            if (direction = 1) { // Moving right
+                let x = x + speed;
+            } else { // Moving down
+                let y = y + speed;
+            }
+        }
+
+        // Check if debris has moved off-screen and reset position if it has
+        if ((x < 0) | (x > 511) | (y > 239)) {
+            do resetPosition(batX, batY);
+        }
+
+        // Update base location
+        do updateBaseLocation();
+
+        //
+        if (frameCounter = 14) {
+            
+            do updateBaseLocation();
+    
+            // Advance animation frame and reset if necessary
+            let animationState = animationState + 1;
+            if (animationState = 6) {
+                let animationState = 0;
+            }
+
+            // Reset frame counter
+            let frameCounter = 0;
+        }
+
+        // Render the debris at the new position
+        do render();
+        return;
+    }
+
+    // reset position with a chance to algin with bat x and y
+    method void resetPosition(int batX, int batY) {
+        var int randomDirection;
+        var int alignWithBat;
+
+        // Clear the debris at the current location 
+        do clear(baseLocation);
+        do clear(prevBaseLocation);
+
+        let randomDirection = rand.getInt(0, 3); // 0=left, 1=right, 2=down
+        let direction = randomDirection;
+
+        // Determine whether to align with bat's position or random position (50% chance)
+        let alignWithBat = rand.getInt(0, 9); // 0 or 1, where 0 = random, 1 = bat's position
+
+        // Set position based on direction and alignment decision
+        if (direction = 2) { // Moving down
+            if (alignWithBat < 6) {
+                let x = batX; // Align x with bat's x position
+            } else {
+                let x = rand.getInt(0, 496); // Random x within screen width
+            }
+            let y = 13; // Start at the top, just below the game info
+        }
+        
+        if (direction = 0) { // Moving left
+            let x = 511; // Start from the right edge
+            if (alignWithBat < 6) {
+                let y = batY; // Align y with bat's y position
+            } else {
+                let y = rand.getInt(13, 240); // Random y within screen height
+            }
+        }
+
+        if (direction = 1) { // Moving right
+            let x = 0; // Start from the left edge
+            if (alignWithBat < 6) {
+                let y = batY; // Align y with bat's y position
+            } else {
+                let y = rand.getInt(13, 240); // Random y within screen height offset 13 for game info
+            }
+        }
+
+        // Update base and previous base locations
+        do updateBaseLocation();
+        let prevBaseLocation = baseLocation;
+        return;
+    }
+
+
+
+        method void render() {
+
+        if (animationState = 0) {
+            do draw1(baseLocation);
+        }
+        if (animationState = 1) {
+            do draw2(baseLocation);
+        }
+        if (animationState = 2) {
+            do draw3(baseLocation);
+        }
+        if (animationState = 3) {
+            do draw4(baseLocation);
+        }
+        if (animationState = 4) {
+            do draw3(baseLocation);
+        }
+        if (animationState = 5) {
+            do draw2(baseLocation);
+        }
+        return;
+    }
+
+    method void updateBaseLocation() {
+        let baseLocation = (y * 32) + (x / 16);
+        return;
+    }
+
+
+    method void updatePrevBaseLocation() {
+        let prevBaseLocation = (prevY * 32) + (prevX / 16);
+        return;
+    }
+
+
+    method void dispose() {
+        do clear(prevBaseLocation);
+        do clear(baseLocation);
+        do Memory.deAlloc(this);
+        return;
+    }
+
+    method void draw1(int location) {
+        var int memAddress; 
+        let memAddress = 16384+location;
+        // column 0
+        do Memory.poke(memAddress, 1008);
+        do Memory.poke(memAddress +32, 4092);
+        do Memory.poke(memAddress +64, 8158);
+        do Memory.poke(memAddress +96, 8166);
+        do Memory.poke(memAddress +128, 16359);
+        do Memory.poke(memAddress +160, 16379);
+        do Memory.poke(memAddress +192, 16383);
+        do Memory.poke(memAddress +224, 16383);
+        do Memory.poke(memAddress +256, 16383);
+        do Memory.poke(memAddress +288, 16383);
+        do Memory.poke(memAddress +320, 8190);
+        do Memory.poke(memAddress +352, 8190);
+        do Memory.poke(memAddress +384, 4092);
+        do Memory.poke(memAddress +416, 1008);
+        return;
+    }
+
+
+    method void draw2(int location) {
+        var int memAddress; 
+        let memAddress = 16384+location;
+        // column 0
+        do Memory.poke(memAddress, 1008);
+        do Memory.poke(memAddress +32, 4092);
+        do Memory.poke(memAddress +64, 7934);
+        do Memory.poke(memAddress +96, 6654);
+        do Memory.poke(memAddress +128, 14847);
+        do Memory.poke(memAddress +160, 14335);
+        do Memory.poke(memAddress +192, 16383);
+        do Memory.poke(memAddress +224, 16383);
+        do Memory.poke(memAddress +256, 16383);
+        do Memory.poke(memAddress +288, 16383);
+        do Memory.poke(memAddress +320, 8190);
+        do Memory.poke(memAddress +352, 8190);
+        do Memory.poke(memAddress +384, 4092);
+        do Memory.poke(memAddress +416, 1008);
+        return;
+    }
+
+    method void draw3(int location) {
+        var int memAddress; 
+        let memAddress = 16384+location;
+        // column 0
+        do Memory.poke(memAddress, 1008);
+        do Memory.poke(memAddress +32, 4092);
+        do Memory.poke(memAddress +64, 8190);
+        do Memory.poke(memAddress +96, 8190);
+        do Memory.poke(memAddress +128, 16383);
+        do Memory.poke(memAddress +160, 16383);
+        do Memory.poke(memAddress +192, 16383);
+        do Memory.poke(memAddress +224, 16383);
+        do Memory.poke(memAddress +256, 14335);
+        do Memory.poke(memAddress +288, 14847);
+        do Memory.poke(memAddress +320, 6654);
+        do Memory.poke(memAddress +352, 7934);
+        do Memory.poke(memAddress +384, 4092);
+        do Memory.poke(memAddress +416, 1008);
+        return;
+    }
+
+    method void draw4(int location) {
+        var int memAddress; 
+        let memAddress = 16384+location;
+        // column 0
+        do Memory.poke(memAddress, 1008);
+        do Memory.poke(memAddress +32, 4092);
+        do Memory.poke(memAddress +64, 8190);
+        do Memory.poke(memAddress +96, 8190);
+        do Memory.poke(memAddress +128, 16383);
+        do Memory.poke(memAddress +160, 16383);
+        do Memory.poke(memAddress +192, 16383);
+        do Memory.poke(memAddress +224, 16383);
+        do Memory.poke(memAddress +256, 16379);
+        do Memory.poke(memAddress +288, 16359);
+        do Memory.poke(memAddress +320, 8166);
+        do Memory.poke(memAddress +352, 8158);
+        do Memory.poke(memAddress +384, 4092);
+        do Memory.poke(memAddress +416, 1008);
+        return;
+    }
+
+    method void clear(int location) {
+        var int memAddress; 
+        let memAddress = 16384+location;
+        // column 0
+        do Memory.poke(memAddress, 0);
+        do Memory.poke(memAddress +32, 0);
+        do Memory.poke(memAddress +64, 0);
+        do Memory.poke(memAddress +96, 0);
+        do Memory.poke(memAddress +128, 0);
+        do Memory.poke(memAddress +160, 0);
+        do Memory.poke(memAddress +192, 0);
+        do Memory.poke(memAddress +224, 0);
+        do Memory.poke(memAddress +256, 0);
+        do Memory.poke(memAddress +288, 0);
+        do Memory.poke(memAddress +320, 0);
+        do Memory.poke(memAddress +352, 0);
+        do Memory.poke(memAddress +384, 0);
+        do Memory.poke(memAddress +416, 0);
+        do Memory.poke(memAddress +448, 0);
+        do Memory.poke(memAddress +480, 0);
+        return;
+    }
+}

@@ -1,0 +1,196 @@
+class Game {
+    field Array debrisArray;
+    field Rand rand;
+    field Bat bat;
+    field int frameCounter;
+    field int lives;
+    field int debrisCount;
+    field int maxSpeed;
+    field int level;
+    field int levelDuration;
+    field int currentLevelTime;
+
+
+    constructor Game new(int debrisCountParam, int maxSpeedParam, int seed, int startLevel){
+        var int i;
+        var int randomX;
+        var int randomY;
+        var int randomDirection;
+     
+        let rand = Rand.new(seed);
+        let bat = Bat.new(240, 112);
+        let frameCounter = 0;
+        let lives = 3;
+         let level = startLevel;
+        let levelDuration = 300; // 300 frames per level
+        let currentLevelTime = 0;
+        let debrisCount = debrisCountParam;
+        let debrisArray = Array.new(debrisCount);
+        let maxSpeed = maxSpeedParam;
+
+        let i = 0;
+        while (i < debrisCount) {
+            // Generate random positions and directions
+            let randomX = rand.getInt(0, 496); // Screen width
+            let randomY = 13; // Start at the top of the screen 13px to offset game info
+            let randomDirection = rand.getInt(0, 3); // 0=left, 1=right, 2=top
+
+            let debrisArray[i] = Debris.new(randomX, randomY, randomDirection, maxSpeed, seed + i); // seed needs to be unqiue to allow for different speed
+            let i = i + 1;
+        }
+
+        return this;
+    }
+
+    method void update() {
+        var boolean hitDetected;
+        var int key;
+        var int i;
+        var Debris debris;
+        var boolean isHit;
+        var int randomChance;
+
+        let key = Keyboard.keyPressed();
+        if ( ~(key = 0)) {
+            // left
+            if(key = 130) {
+                do bat.move(-5,0);
+            }
+            // down
+            if(key = 131) {
+               do bat.move(0, -5);
+            }
+            // right
+            if(key = 132) {
+                do bat.move(5, 0 );
+            }
+            // up
+            if(key = 133) {
+                do bat.move(0, 5);
+            }
+            // E
+            //if (key = 69) { TODO! fire projectile }
+
+        }
+
+        do bat.tick();
+
+        let currentLevelTime = currentLevelTime + 1;
+
+        // Update debris
+        let i = 0;
+        while (i < debrisCount) {
+            let debris = debrisArray[i];
+            do debris.tick(bat.getX(), bat.getY());
+
+            // Check if debris is off-screen
+            if (debris.getY() > 239 | debris.getX() < 0 | debris.getX() > 511) {
+                do debris.resetPosition(bat.getX(), bat.getY());  // Reset position if off-screen
+            }
+
+            let i = i + 1;
+        }
+
+        // Check collisions
+        let i = 0;
+        while (i < debrisCount) {
+            let isHit = checkCollision(i);
+            if (isHit) {
+                // Handle collision
+                let lives = lives - 1;
+                do updateLivesCounter();
+                let debris = debrisArray[i];
+                do debris.resetPosition(bat.getX(), bat.getY()); 
+            } else {
+                let i = i + 1;
+            }
+        }
+
+        return;
+    }
+
+    method void shiftDebrisLeft(int index) {
+        var int j;
+        let j = index;
+        while (j < (debrisCount - 1)) {
+            let debrisArray[j] = debrisArray[j + 1];
+            let j = j + 1;
+        }
+        // Set the last element to null
+        let debrisArray[debrisCount - 1] = null;
+        return;
+    }
+
+
+    method boolean run() {
+        do Output.moveCursor(0, 0);
+        do Output.printString("Lives:");
+        do updateLivesCounter();
+        
+        do Screen.drawLine(0, 12, 511, 12);
+        while (true) {
+
+        
+            let frameCounter = frameCounter + 1;         
+
+            if (frameCounter = 3){
+                do update();
+                let frameCounter = 0;
+            }
+
+            if(lives = 0) {
+                // return false for failed game state
+                return false; // game over
+            }
+
+            if (currentLevelTime > levelDuration) {
+                return true; // Level completed
+            }
+        
+            do Sys.wait(5);            
+        }
+        return true;
+    }
+
+    // Print Updated Life Counter
+    method void updateLivesCounter() {    
+        do Output.moveCursor(0, 6);
+        do Screen.setColor(false);
+        do Output.printChar(" ");
+        do Screen.setColor(true);
+        do Output.moveCursor(0, 6);
+        do Output.printInt(lives);
+        return;
+    }
+
+    method boolean checkCollision(int debrisIndex) {
+        var Debris debris;
+        var int batLeft, batRight, batTop, batBottom;
+        var int debrisLeft, debrisRight, debrisTop, debrisBottom;
+    
+ 
+        let debris = debrisArray[debrisIndex];
+
+        // Calculate the edges of the bat
+        let batLeft = bat.getX() - 16;
+        let batRight = bat.getX() + 16;
+        let batTop = bat.getY() - 16;
+        let batBottom = bat.getY() + 16;
+
+        // Calculate the edges of the debris
+        let debrisLeft = debris.getX() - 8;
+        let debrisRight = debris.getX() + 8;
+        let debrisTop = debris.getY() - 8;
+        let debrisBottom = debris.getY() + 8;
+
+        // Check for overlap on x-axis
+        if ((batLeft < debrisRight) & (batRight > debrisLeft)) {
+            // Check for overlap on y-axis
+            if ((batTop < debrisBottom) & (batBottom > debrisTop)) {
+                return true; // Collision detected
+            }
+        }
+
+        return false; // No collision
+    }
+}
